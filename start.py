@@ -131,5 +131,5 @@ class WeSong():
 
 if __name__ == '__main__':
     w=WeSong()
-    ids =[""]  # 存放歌手首页地址
+    ids =["http://kg.qq.com/node/personal?uid=619a958c25283e88"]  # 存放歌手首页地址
     w.main(ids)
