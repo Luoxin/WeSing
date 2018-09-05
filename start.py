@@ -27,7 +27,7 @@ class WeSong():
 
         # 基础信息
         self.baseURL="http://kg.qq.com/node/personal?uid="
-        self.path="F:/Song"
+        self.path="F:/Song/"
 
         try:
             os.mkdir(self.path)
