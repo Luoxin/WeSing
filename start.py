@@ -30,7 +30,7 @@ class WeSong():
         self.path="F:/Song"
 
         try:
-            os.mkdir("data")
+            os.mkdir(self.path)
         except:
             pass
 
@@ -51,12 +51,13 @@ class WeSong():
                 sleep(2)
             except:
                 pass
+            # break
 
         try:
-            addurl_obj = self.driver.find_elements_by_xpath('//ul//li[@class="mod_playlist__item"]//a')
+            addurl_objs = self.driver.find_elements_by_xpath('//ul//li[@class="mod_playlist__item"]//a')
 
-            for i in range(addurl_obj.__len__()):
-                self.songPage.add_new_url(addurl_obj[i].get_attribute("href"))
+            for i,addurl_obj in enumerate(addurl_objs):
+                self.songPage.add_new_url(addurl_obj.get_attribute("href"))
         except:
             pass
 
@@ -109,6 +110,7 @@ class WeSong():
                 sleep(2)
             except:
                 pass
+            # break
 
         print(f"获得{self.downloadMusic.get_urls_len()}个下载连接")
 
@@ -118,7 +120,7 @@ class WeSong():
                 url=itme["audio_url"]
                 fileName=self.path+str(itme["singer_name"])+"-"+str(itme["music_name"])+".m4a"
                 self.download_file(url,fileName)
-                # print(f'{itme["singer_name"]} has download')
+                print(f'{itme["singer_name"]}-{itme["music_name"]} 下载完成')
                 #sleep(2)
             except:
                 pass
