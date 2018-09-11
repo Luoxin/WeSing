@@ -29,7 +29,7 @@ class WeSong():
         # 基础信息
         self.baseURL="http://kg.qq.com/node/personal?uid="  # 歌手主页
         # self.path="F:/Song/"
-        self.path="./Song/"  # 存储位置
+        self.path="F:/Song/"  # 存储位置
 
         try:
             os.mkdir(self.path)
