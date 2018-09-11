@@ -1,8 +1,8 @@
 import json
 import os
 from time import sleep
-from contextlib import closing
-import requests
+import  sys
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import tqdm
@@ -10,24 +10,26 @@ import tqdm
 from url_controller import UrlControl
 from download_html import HtmlDownloader
 from html_analyze import HtmlParser
+from download_file import download_file
 
 
 class WeSong():
     def __init__(self):
-        self.downloadHTML=HtmlDownloader()
-        self.songPageParse=HtmlParser()
+        self.downloadHTML=HtmlDownloader()  # 用于下载列表页
+        self.songPageParse=HtmlParser()  # 用于解析歌曲页
 
-        self.songPage=UrlControl()
-        self.downloadMusic=UrlControl()
+        self.songPage=UrlControl()  # 歌曲页
+        self.downloadMusic=UrlControl()  # 下载连接以及下载的相关信息
 
         self.driver_name = 'chrome'
-        self.executable_path = "./chromedriver.exe"
+        self.executable_path = "./chromedriver.exe"  # 驱动
         # self.driver = webdriver.PhantomJS()
 
 
         # 基础信息
-        self.baseURL="http://kg.qq.com/node/personal?uid="
-        self.path="F:/Song/"
+        self.baseURL="http://kg.qq.com/node/personal?uid="  # 歌手主页
+        # self.path="F:/Song/"
+        self.path="./Song/"  # 存储位置
 
         try:
             os.mkdir(self.path)
@@ -51,7 +53,7 @@ class WeSong():
                 sleep(2)
             except:
                 pass
-            # break
+
 
         try:
             addurl_objs = self.driver.find_elements_by_xpath('//ul//li[@class="mod_playlist__item"]//a')
@@ -61,18 +63,6 @@ class WeSong():
         except:
             pass
 
-    def download_file(self,url,fileName):
-        with closing(requests.get(url, stream=True)) as response:
-            chunk_size = 1024  # 单次请求最大值
-            content_size = int(response.headers['content-length'])  # 内容体总大小
-            data_count = 0
-            with open(fileName, "wb") as file:
-                for data in response.iter_content(chunk_size=chunk_size):
-                    file.write(data)
-                    data_count = data_count + len(data)
-                    now_jd = (data_count / content_size) * 100
-                    # print("\r %s文件下载进度：%d%%(%d/%d) - %s" % (fileName,now_jd, data_count, content_size, url), end=" ")
-                    print(f"\r \t{fileName} \t下载进度 \t{now_jd}%( {data_count/1024}kb/{content_size/1024}kb )\t", end="")
 
 
     def main(self,ids):
@@ -80,6 +70,7 @@ class WeSong():
         1. 下载页面
         2. 页面解析
         3. 扩链以（歌曲也以及下载连接）
+        4. 调用下载器下载歌曲
         :return:
         '''
 
@@ -97,6 +88,7 @@ class WeSong():
             except:
                 pass
         self.driver.close()
+        self.driver.__exit__()
 
         print(f"获取到{self.songPage.get_urls_len()}个歌曲")
 
@@ -110,7 +102,7 @@ class WeSong():
                 sleep(2)
             except:
                 pass
-            # break
+
 
         print(f"获得{self.downloadMusic.get_urls_len()}个下载连接")
 
@@ -119,19 +111,18 @@ class WeSong():
                 itme=json.loads(self.downloadMusic.get_new_url())
                 url=itme["audio_url"]
                 fileName=self.path+str(itme["singer_name"])+"-"+str(itme["music_name"])+".m4a"
-                self.download_file(url,fileName)
-                print(f'{itme["singer_name"]}-{itme["music_name"]} 下载完成')
-                #sleep(2)
+                download_file(url,fileName)
             except:
                 pass
 
         print("End")
 
-        pass
-
-
 
 if __name__ == '__main__':
     w=WeSong()
-    ids =["http://kg.qq.com/node/personal?uid=619a958c25283e88"]  # 存放歌手首页地址
+    try:
+        ids=list(sys.argv[1:])
+        print(ids)
+    except:
+        ids =["http://kg.qq.com/node/personal?uid=619a958c25283e88"]  # 存放歌手首页地址
     w.main(ids)
